@@ -57,4 +57,4 @@ history = model.fit(X_train, Y_train,
                     batch_size=128, epochs=30,
                     validation_data=(X_test, Y_test))
 
-model.save('./mnistSmall2.h5')
+model.save('./mnistSmall.h5')
