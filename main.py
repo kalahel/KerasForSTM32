@@ -40,10 +40,10 @@ print("Shape after one-hot encoding: ", Y_train.shape)
 
 inputs = Input(shape=(28, 28, 1))
 
-x = Conv2D(64, (5, 5), input_shape=(28, 28, 1), use_bias=False, padding="same", kernel_regularizer=l2(0.0001))(inputs)
+x = Conv2D(8, (5, 5), input_shape=(28, 28, 1), use_bias=False, padding="same", kernel_regularizer=l2(0.0001))(inputs)
 x = Activation("relu")(x)
 x = MaxPooling2D((3, 3), strides=(2, 2))(x)
-x = Conv2D(8, (5, 5), use_bias=False, padding="same", kernel_regularizer=l2(0.0001))(x)
+x = Conv2D(4, (5, 5), use_bias=False, padding="same", kernel_regularizer=l2(0.0001))(x)
 x = Activation("relu")(x)
 x = MaxPooling2D((3, 3), strides=(2, 2))(x)
 x = Flatten()(x)
@@ -57,4 +57,4 @@ history = model.fit(X_train, Y_train,
                     batch_size=128, epochs=30,
                     validation_data=(X_test, Y_test))
 
-model.save('./mnistSmall.h5')
+model.save('./mnistSmall2.h5')
