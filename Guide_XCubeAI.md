@@ -67,10 +67,10 @@ print("Shape after one-hot encoding: ", Y_train.shape)
 
 inputs = Input(shape=(28, 28, 1))
 
-x = Conv2D(64, (5, 5), input_shape=(28, 28, 1), use_bias=False, padding="same", kernel_regularizer=l2(0.0001))(inputs)
+x = Conv2D(8, (5, 5), input_shape=(28, 28, 1), use_bias=False, padding="same", kernel_regularizer=l2(0.0001))(inputs)
 x = Activation("relu")(x)
 x = MaxPooling2D((3, 3), strides=(2, 2))(x)
-x = Conv2D(8, (5, 5), use_bias=False, padding="same", kernel_regularizer=l2(0.0001))(x)
+x = Conv2D(4, (5, 5), use_bias=False, padding="same", kernel_regularizer=l2(0.0001))(x)
 x = Activation("relu")(x)
 x = MaxPooling2D((3, 3), strides=(2, 2))(x)
 x = Flatten()(x)
@@ -107,7 +107,23 @@ Le modèle a dû normalement être sauvegardé dans le même dossier que le scri
 
 Vous pouvez utiliser [Netron](https://github.com/lutzroeder/netron) pour visualiser le réseau produit en se basant sur le `.h5`.
 
-![mnistsmall](https://i.ibb.co/Prd49gS/Capture.png)
+![mnistsmall](https://i.ibb.co/q7FDYHK/mnist-Small.png)
+
+## Explications du réseau
+
+Le réseau produit doit répondre à deux critères, d'abord de dimension et ensuite de précision. Le modèle doit pouvoir être utilisé sur une carte nucleo F446Re qui n'a que 512 Ko de mémoire flash et 128 Ko de RAM.
+
+Pour ne pas dépasser ses capacités il faut donc veiller à réduire le nombre de poids, mais aussi la taille totale qui doit être allouée pour les différentes opérations.
+
+Par exemple, une couche de convolution avec 100 filtres 5x5, ne représente que 5x5x100, soit 2500 poids, étant chacun stocké en nombre flottant cela représente 2500x4 = 10 ko. En revanche, la mémoire nécessaire pour stocker le résultat de ces convolutions représenterai dans notre cas 28x28x100x4 = 313 600 octets, ce qui est plus de deux fois supérieur à la mémoire RAM disponible.
+
+L'implémentation exacte de la librairie Cube AI n'est pas accessible à l'utilisateur, mais on peut spéculer sur le fait qu'elle utilise certaines astuces pour réduire le nombre de valeurs intermédiaires à stocker lors l'inférence. Elle applique certainement la fonction d'activation puis le MaxPooling (s'il y en a un) filtre après filtre, plutôt que de réaliser toutes les convolutions avant d'appliquer l'activation et le pooling.
+
+L'architecture présentée, utilise des couches de convolution, ce qui permet de détecter des paternes. La fonction d'activation (Relu) à la sortie de chaque convolution permet d'éliminer les valeurs négatives et d'introduire de la non-linéarité lors de l'entraînement. Les données sont essentialisées grâce au Max Pooling  en ne gardant que les valeurs maximales locales. Les deux couches Dense (appelé aussi fully connected) réalisent la classification en elle-même.
+
+Les réseau de convolution sont des architectures qui ont faites leurs preuves dans le domaine de la reconnaissance d'image, celle-ci en est un petit modèle ne nécessitant que 42.74 Ko de mémoire Flash et 11.01 Ko de RAM pour fonctionner sur la carte STM32 (valeurs données par Cube MX).
+
+
 
 ## Cube MX
 
