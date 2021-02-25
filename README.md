@@ -13,7 +13,7 @@ La sortie est un vecteur de 10 nombres à virgule flottante représentant les va
 
 Le script `checkModel.py` permet d'évaluer les performances d'un modèle entrainé dans les conditions décrites précédemment.
 
-## Utilisation du modèle déployer sur stm32
+## Utilisation du modèle déployé sur stm32
 
 Le script `SerialSenderReceiver.py` est à utilisé conjointement avec une carte STM32 connectée avec le programme `STM/mnistSmallerUsartV1/main.c` chargé dessus.
 
