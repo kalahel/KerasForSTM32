@@ -30,7 +30,9 @@ else:
     print('Acknowledgement valid, commencing data send')
     id = 0
     differences = []
+    acc_differences = []
     start_time = time.time()
+
     for entry_x, entry_y in zip(X_test, Y_test):
 
         data = np.reshape(entry_x, 28 * 28)
@@ -53,10 +55,17 @@ else:
         # [print(i, ' : ', x) for i, x in enumerate(results)]
 
         differences.append(sum(abs(np.subtract(results, entry_y))))
+        # Using a threshold to give binary value to results 0.0 or 1.0
+        results_rounded = [float(x >= 0.5) for x in results]
+        # Computing difference with expected value, 0 true positive, 1 false positive, -1 false negative
+        acc_differences.append(np.subtract(results_rounded, entry_y))
         id += 1
         if (id % 10 == 0):
             print(id, '/', len(X_test))
     end_time = time.time()
-    print('Model mean error : ', sum(differences) / len(X_test))
+    # Get a dictionary containing tp, fp and fn
+    acc_result = dict(zip(*np.unique((np.array(acc_differences)).flatten(), return_counts=True)))
+    accuracy = acc_result[0.0]/len((np.array(acc_differences)).flatten())
+    print('Model mean error : ', sum(differences) / len(X_test), ' Accuracy : ', accuracy)
     print('Total elapsed time : ', end_time - start_time, 's', '\tElapsed time per data entry : ',
           (end_time - start_time) / len(X_test), 's')
