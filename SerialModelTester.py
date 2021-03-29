@@ -4,14 +4,17 @@ import numpy as np
 from keras.datasets import mnist
 from keras.utils import np_utils
 import time
+import tqdm
+
+
+nb_sample_to_evaluate = 1000
 
 ser = serial.Serial('COM4', 115200, timeout=20000000)
 
 (X_train, y_train), (X_test, y_test) = mnist.load_data()
 # Reducing the amount of data
-X_test = X_test[0:int(len(X_test) / 100)]
-y_test = y_test[0:int(len(y_test) / 100)]
-
+X_test = X_test[0:nb_sample_to_evaluate]
+y_test = y_test[0:nb_sample_to_evaluate]
 X_test = X_test.astype('float32')
 
 # normalizing the data from 255 to [0,1] to help with the training
@@ -31,10 +34,13 @@ else:
     id = 0
     differences = []
     acc_differences = []
+    # This allow tqdm to display properly
+    time.sleep(1)
     start_time = time.time()
 
-    for entry_x, entry_y in zip(X_test, Y_test):
-
+    for i in tqdm.tqdm(range(0,nb_sample_to_evaluate)):
+        entry_x = X_test[i]
+        entry_y = Y_test[i]
         data = np.reshape(entry_x, 28 * 28)
         # Create checksum of data
         checksum = sum(data)
@@ -60,8 +66,6 @@ else:
         # Computing difference with expected value, 0 true positive, 1 false positive, -1 false negative
         acc_differences.append(np.subtract(results_rounded, entry_y))
         id += 1
-        if (id % 10 == 0):
-            print(id, '/', len(X_test))
     end_time = time.time()
     # Get a dictionary containing tp, fp and fn
     acc_result = dict(zip(*np.unique((np.array(acc_differences)).flatten(), return_counts=True)))
