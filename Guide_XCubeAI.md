@@ -255,6 +255,38 @@ simple_outputs[9]	float	1.60644595e-005
 
 Nous utilisons un encodage one-hot pour la sortie, on peux donc voir que c'est bien un 4 qui à été reconnu.
 
+## Utilisation de la liaison série
+
+Il est nécessaire de valider le modèle sur la carte, mais sa mémoire étant limité il est impossible de stocker un jeu de test important.
+
+Une alternative simple est de procéder à l'envoie des images par la liaison série puis de récolter les résultats. Ce processus bien que lent permet de s'affranchir des contraintes mémoire de la carte.
+
+Voici la succession d'échanges entre les deux programmes :
+
+![serialComExchange](https://i.ibb.co/GsSMXKG/Stm32-Serial.png)
+
+Le `checksum` est calculé en faisant simplement la somme de tous les pixels de l'image. Cela permet de vérifier qu'il n'y a pas eu de dégradation des données lors de l'envoi.
+
+Le script python est `SerialModelTester.py`.
+
+Le code  C pour la carte STM32 est `STM32/mnistSmallerUsartFullTestV0/main.c`.
+
+### Résultats
+
+Le programme python va ensuite récolter les résultats de classification envoyés par la carte puis les comparer aux classifications réelles pour déterminer les performances du modèle.
+
+Voici les résultats sur la carte pour 1000 images : 
+
+| Précision de classification | Erreur moyenne par image |
+| --------------------------- | ------------------------ |
+| 0.9968                      | 0.058855                 |
+
+On constate que la précision du modèle reste supérieur à 99%, il ne semble donc pas y avoir eu de perte lié à son import sur la carte.
+
+l'erreur moyenne par image est calculée en faisant la somme des différences absolues entre les valeurs attendues pour une images et les résultats de classification.
+
+Le programme complet à pris 302 secondes pour être effectué soit 0.302 secondes par image. La moitié du temps de traitement est dû à l'inférence du modèle sur la carte.
+
 ## Sources
 
 [Tutorial officiel](https://www.google.com/search?client=firefox-b-d&q=getting+started+xcube+ai#kpvalbx=_P3siYLzbFtCEadiouIAH12)
