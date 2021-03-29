@@ -271,6 +271,8 @@ Le script python est `SerialModelTester.py`.
 
 Le code  C pour la carte STM32 est `STM32/mnistSmallerUsartFullTestV0/main.c`.
 
+**Note** : il faut lancer le programme C en premier. En cas de problème, il faut le lancer en mode débogage.
+
 ### Résultats
 
 Le programme python va ensuite récolter les résultats de classification envoyés par la carte puis les comparer aux classifications réelles pour déterminer les performances du modèle.
